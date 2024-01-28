@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:13
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_DB=ny_taxi
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "admin"]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+    restart: always
+    networks:
+      - pg-db
+
+  jupyter:
+    image: jupyter:etl
+    # build:
+    #   context: .
+    #   dockerfile: ./Dockerfile
+    volumes:
+      - ./jupyter-data:/app
+    depends_on:
+      - postgres
+    ports:
+    - "8888:8888"
+    networks:
+      - pg-db
+    # command: tail -f /dev/null
+  
+  taxi_ingest:
+    # image: taxi_ingest:v001
+    build: 
+      context: .
+      dockerfile: ./Dockerfile
+    depends_on:
+      - postgres
+    networks:
+      - pg-db
+    command: >
+      --user=admin
+      --password=admin
+      --host=postgres
+      --port=5432
+      --db=ny_taxi
+      --table_name=green_taxi_trips
+      --url=https://github.com/DataTalksClub/nyc-tlc-data/releases/download/green/green_tripdata_2019-09.csv.gz
+
+
+networks:
+  pg-db:
+    driver: bridge

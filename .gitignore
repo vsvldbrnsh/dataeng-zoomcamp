@@ -1,0 +1,23 @@
+# System files and directories
+.Trash-0/
+.DS_Store # if using macOS
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Database data (local configuration and data files)
+1_intro/db-data/
+
+# Large data files (if these CSV files are large or generated)
+1_intro/jupyter-data/*.csv
+
+# Ignore Python compiled files
+*.pyc
+__pycache__/
+
+# Ignore Terraform plan files, if applicable
+1_intro/terraform/*.tfplan
+1_intro/terraform/.terraform/
+
+# Additional files and directories to ignore can be added here
+
